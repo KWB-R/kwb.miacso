@@ -1,0 +1,10 @@
+Package: kwb.miacso
+Maintainer: Hauke Sonnenberg <hauke.sonnenberg@kompetenz-wasser.de>
+Depends: kwb.misc
+Author: Hauke Sonnenberg
+Version: 0.0.99
+License: GPL
+Title: functions used in KWB project MIA-CSO
+Description: functions used in KWB project MIA-CSO,
+        for example for plotting data availabilities.
+
