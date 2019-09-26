@@ -7,4 +7,5 @@ License: GPL
 Title: functions used in KWB project MIA-CSO
 Description: functions used in KWB project MIA-CSO,
         for example for plotting data availabilities.
-
+Remotes:  
+    github::kwb-r/kwb.misc
