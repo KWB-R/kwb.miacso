@@ -13,27 +13,39 @@ hsMoniPoints <- function(kind = NULL, owner = "KWB")
   .check.kind(kind)   # stop if kind value is invalid
   .check.owner(owner) # stop if owner value is invalid
   
-  if (kind == "q") {
-    if (owner == "KWB") {
-      mps <- matrix(c("STA", "Stallstr",
-                      "MUE", "Muehlendamm",
-                      "TEG", "Tegeler Weg"), ncol = 2, byrow = TRUE)
-    } else if (owner == "SEN") {
-      # Names of senate monitoring points are found in tbl_Messstellen
-      mps <- kwb.db::hsGetTable(
-        qmdb("r", "STA", owner = "SEN"), "tbl_Messstellen", 
-        fields = "Abkuerzung, Langname", dbg = FALSE
-      )
-    } else {
-      mps <- matrix() # stop("No data of owner BWB available.\n")
-    }
-  } else if (kind == "h") {
-    stop("monitoring points of hydraulic data not yet implemented.\n")
-  } else if (kind == "r") {
-    stop("monitoring points of rain data not yet implemented.\n")
+  if (kind == "h") {
+    clean_stop("monitoring points of hydraulic data not yet implemented.\n")
   }
   
-  mps
+  if (kind == "r") {
+    clean_stop("monitoring points of rain data not yet implemented.\n")
+  }
+  
+  # Here we are dealing with water quality monitoring points
+  stopifnot(kind == "q")
+  
+  if (owner == "KWB") {
+
+    matrix(ncol = 2, byrow = TRUE, c(
+      "STA", "Stallstr",
+      "MUE", "Muehlendamm",
+      "TEG", "Tegeler Weg"
+    ))
+    
+  } else if (owner == "SEN") {
+    
+    # Names of senate monitoring points are found in tbl_Messstellen
+    kwb.db::hsGetTable(
+      mdb = qmdb("r", "STA", owner = "SEN"), 
+      tbl = "tbl_Messstellen", 
+      fields = "Abkuerzung, Langname", 
+      dbg = FALSE
+    )
+    
+  } else {
+    
+    matrix() # stop("No data of owner BWB available.\n")
+  }
 }
 
 # miadir -----------------------------------------------------------------------
@@ -64,12 +76,10 @@ miadir <- function(
     owner, kind, quaLevel, resol, depth
   )
   
-  if (dbg) {
-    cat("in miadir(", msg, ")\n")
-  }
-  
+  kwb.utils::catIf(dbg, "in miadir(", msg, ")\n")
+
   if (depth > 10) {
-    stop("Maximum recursion depth (10) reached. Check tblDirStruct for endless ",
+    clean_stop("Maximum recursion depth (10) reached. Check tblDirStruct for endless ",
          "loops during recursive path resolution.\n")    
   }
   
@@ -92,32 +102,25 @@ miadir <- function(
     }
   }
   
-  if (dbg) {
-    cat("NCRIT:", NCRIT, "\n")
-    cat("full directory structure:\n")
-    print(DS)
-    cat("filtered directory structure:\n")
-    print(rec)
-  }
+  kwb.utils::catIf(dbg, "NCRIT:", NCRIT, "\n")
+  kwb.utils::printIf(dbg, DS, "full directory structure")
+  kwb.utils::printIf(dbg, rec, "filtered directory structure")
   
   if (nrow(rec) == 0) {
-    stop("No directory specified for these criteria: ", msg, "\n",
+    clean_stop("No directory specified for these criteria: ", msg, "\n",
          "You need to specify at least one more criterion.\n")    
   }
   
   if (nrow(rec) > 1) {
     print(rec)
-    stop("Ambiguous combination of criteria (", msg, ")\n")
+    clean_stop("Ambiguous combination of criteria (", msg, ")\n")
   }
   
   subdir  <- rec[1, NCRIT + 1]
   context <- rec[1, (NCRIT + 2):(2 * NCRIT + 1)]
   
-  if (dbg) {
-    cat("context:\n")
-    print(context)
-    cat(sprintf("subdir = '%s'\n", subdir))
-  }
+  kwb.utils::printIf(dbg, context)
+  kwb.utils::catIf(dbg, sprintf("subdir = '%s'\n", subdir))
   
   # Return the subdir if there is no context to resolve
   if (sum(is.na(context)) == NCRIT) {
@@ -164,9 +167,9 @@ miamdb2 <- function(id = 0)
   }
   
   # Return an empty string if the id is invalid
-  if (! id %in% 1:nrow(mdbs)) {
-    cat ("Invalid database id. Run miamdb2() without arguments to get",
-         "a list of available ids.\n")
+  if (! id %in% seq_len(nrow(mdbs))) {
+    cat("Invalid database id. Run miamdb2() without arguments to get",
+        "a list of available ids.\n")
     return("")
   }
   
@@ -191,9 +194,11 @@ hsReadMiaMdbs <- function(
 {
   mdbFields <- "mdbFile, mdbDesc, mdbDir, mdbAttrib"
   
+  meta_db <- kwb.misc::mmdb()
+  
   # Read mdb info from R meta db
   dfMdbs <- kwb.db::hsGetTable(
-    kwb.misc::mmdb(), "tblMdbs", fields = mdbFields, dbg = dbg
+    meta_db, "tblMdbs", fields = mdbFields, dbg = dbg
   )
   
   # Update mdb path info if it is requested to search for new databases
@@ -204,9 +209,7 @@ hsReadMiaMdbs <- function(
     # if database paths have been added reread mdb info from meta db
     if (nNew > 0) {
       cat(nNew, "database paths have been added.\n")
-      dfMdbs <- kwb.db::hsGetTable(
-        kwb.misc::mmdb(), "tblMdbs", fields = mdbFields
-      )
+      dfMdbs <- kwb.db::hsGetTable(meta_db, "tblMdbs", fields = mdbFields)
     }
   }
   
@@ -251,8 +254,10 @@ hsUpdateMiaMdbs <- function(dfMdbs, root)
   # to tblMdbs in R meta db
   msg <- paste(mdbsNew, collapse = "\n")
   
-  cat(sprintf("\n%s\nShall I append the above %d database paths", msg, n), 
-      "to the list of known databases (Y,n)? ")
+  cat(
+    sprintf("\n%s\nShall I append the above %d database paths", msg, n), 
+    "to the list of known databases (Y,n)? "
+  )
   
   answer <- scan(n = 1, what = character())
   
@@ -355,10 +360,9 @@ hsDataSource <- function(
   #      "  3. tsField:  name of timestamp field in table,",
   #      "  4. parField: name of parameter field in table.",
   #      sep = "\n")
-  #    stop(msg)
+  #    clean_stop(msg)
   #  }
   
-  #@@2012-04-12;HSB
   .check.owner(owner)
   .check.kind(kind) # stop if kind value is invalid
   .check.qua.level(qua.level) # stop if qua.level value is invalid
@@ -379,8 +383,7 @@ hsDataSource <- function(
     stringsAsFactors = FALSE
   )
   
-  if (dbg)
-    print(info)
+  kwb.utils::printIf(dbg, info)
   
   if (kind == "q") { 
     
@@ -394,13 +397,10 @@ hsDataSource <- function(
       tsField  <- infoRow$tsField
       parField <- sprintf(infoRow$parFieldPtrn, parName)
       
-      if (dbg) {
-        cat("infoRow:\n")
-        print(infoRow)
-        cat(sprintf(
-          "tbl: %s\ntsField: %s\nparField: %s\n", tbl, tsField, parField
-        ))
-      }
+      kwb.utils::printIf(dbg, infoRow)
+      kwb.utils::catIf(dbg, sprintf(
+        "tbl: %s\ntsField: %s\nparField: %s\n", tbl, tsField, parField
+      ))
       
     } else if (owner == "SEN") {
       
@@ -408,11 +408,11 @@ hsDataSource <- function(
     
   } else if (kind == "h") {
     
-    stop("data sources for hydraulic data not yet implemented.\n")
+    clean_stop("data sources for hydraulic data not yet implemented.\n")
     
   } else if (kind == "r") {
     
-    stop("data sources for rain data not yet implemented.\n")
+    clean_stop("data sources for rain data not yet implemented.\n")
   }
   
   # Return source info
@@ -473,7 +473,9 @@ hsPars <- function(
         
       } else {
         
-        stop("available names of calibrated parameters not yet implemented.\n")
+        clean_stop(
+          "available names of calibrated parameters not yet implemented.\n"
+        )
       }
       
     } else if (owner == "SEN") {
@@ -520,7 +522,8 @@ hsGetFpAndValRaw <- function(
       "  \"fps\":  fingerprints",
       sep = "\n"
     )
-    stop(msg)
+    
+    clean_stop(msg)
   }
   
   # Determine database name
@@ -584,6 +587,7 @@ hsGetFpAndValRaw <- function(
 hsGetValData <- function(moniPoint, parName, firstDate, lastDate)
 {
   if (missing(moniPoint)) {
+    
     msg <- paste(
       "\nUsage: hsGetValData(moniPoint, parName, firstDate, lastDate)",
       "  moniPoint: acronym of monitoring point: \"STA\" (Stallstr.), \"TEG\" (Tegeler Weg) or \"MUE\" (Muehlendamm)",
@@ -593,7 +597,8 @@ hsGetValData <- function(moniPoint, parName, firstDate, lastDate)
       "Returns a data.frame containing the validated data, directly drawn from the current databases.",
       sep = "\n"
     )
-    stop(msg)
+    
+    clean_stop(msg)
   }
   
   # Provide path to database, table name and table field names
