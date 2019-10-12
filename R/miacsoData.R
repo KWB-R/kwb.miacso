@@ -1,28 +1,47 @@
-# Shortcut functions -----------------------------------------------------------
-hmdb <- function # hydraulic mdbs
-### hydraulic mdbs
-(...) miamdb('h', ...) 
+# hmdb -------------------------------------------------------------------------
 
-qmdb <- function # (water) quality mdbs
-### (water) quality mdbs
-(...) miamdb('q', ...) 
+#' MS Access Databases (Hydraulic Data)
+#' 
+#' @param \dots arguments passed to \code{\link{miamdb}}
+hmdb <- function(...)
+{
+  miamdb('h', ...) 
+}
 
-rmdb <- function # rain mdbs
-### rain mdbs
-(...) miamdb('r', ...) 
+# qmdb -------------------------------------------------------------------------
+
+#' MS Access Databases (Water Quality Data) 
+#' 
+#' @param \dots arguments passed to \code{\link{miamdb}}
+qmdb <- function(...)
+{
+  miamdb('q', ...) 
+}
+
+# rmdb -------------------------------------------------------------------------
+
+#' MS Access Databases (Rain Data) 
+#' 
+#' @param \dots arguments passed to \code{\link{miamdb}}
+rmdb <- function(...)
+{
+  miamdb('r', ...) 
+}
 
 # miamdb -----------------------------------------------------------------------
-miamdb <- function
-### Returns full path to a MIA-CSO project database.
-(
-  kind = NULL,
-  ### kind of data: "q" = water quality, "h" = hydraulic data, "r" = rain
-  moniPoint = NULL, 
-  ### name of monitoring point, e.g. "STA", "TEG", "MUE"
-  qua.level = NULL,
-  ### data quality level ("r" = raw, "v" = validated, "c" = calibrated) 
-  owner = "KWB"
-  ### owner of the data, one of "KWB", "SEN", "BWB"  
+
+#' Get Path to MS Access Database Used in MIA-CSO
+#'
+#' @param kind kind of data: "q" = water quality, "h" = hydraulic data, "r" =
+#'   rain
+#' @param moniPoint name of monitoring point, e.g. "STA", "TEG", "MUE"
+#' @param qua.level data quality level ("r" = raw, "v" = validated, "c" =
+#'   calibrated)
+#' @param owner owner of the data, one of "KWB", "SEN", "BWB"
+#' @return This function returns the full path to the Access database containing
+#'   the specified kind of data
+miamdb <- function(
+  kind = NULL, moniPoint = NULL, qua.level = NULL, owner = "KWB"
 ) 
 {  
   .check.kind(kind)           # stop if kind value is invalid
@@ -41,23 +60,18 @@ miamdb <- function
                 switch(EXPR = qua.level, r = sprintf("1RAW/KWB_JoinedData.mdb"),
                        v = sprintf("2VAL/KWB_%s_VAL.mdb", moniPoint),
                        c = sprintf("3CAL/KWB_CAL.mdb")))
-    }
-    else if (owner == "SEN") {
+    } else if (owner == "SEN") {
       cat("WARNING: no distinction between raw, valid and calibrated data for owner 'SEN'.\n")
       file.path("//moby/miacso$/Daten/ACCESS/Gewaesserguete/kontinuierlich",
                 "Messreihen", "Hauptparameter_Senat.mdb")
-    }
-    else {
+    } else {
       stop("No water quality data of owner BWB available.\n")      
     }
-  }
-  else if (kind == "h") { # hydraulic data
+  } else if (kind == "h") { # hydraulic data
     stop("mdb paths for hydraulic data not yet implemented.\n")
-  }
-  else if (kind == "r") {
+  } else if (kind == "r") {
     stop("mdb paths for rain data not yet implemented.\n")
   }
-  ### Returns full path to Access database containing the specified kind of data
 }
 
 # .check.kind ------------------------------------------------------------------
@@ -65,11 +79,13 @@ miamdb <- function
 {  
   msg <- "(Data) kind must be one of \'q\' (water quality), \'h\' (hydraulic) or \'r\' (rain).\n"
   
-  if (is.null(kind)) 
+  if (is.null(kind)) {
     stop("No (data) kind given. ", msg)
+  }
   
-  if (! kind %in% c("q", "h", "r")) 
+  if (! kind %in% c("q", "h", "r")) {
     stop(msg)
+  }
 }
 
 # .check.owner -----------------------------------------------------------------
@@ -77,11 +93,13 @@ miamdb <- function
 {  
   msg <- "(Data) owner must be one of \'KWB\', \'SEN\' (Senate) or \'BWB\'.\n"
   
-  if (is.null(owner)) 
+  if (is.null(owner)) {
     stop("No (data) owner given. ", msg)
+  }
   
-  if (! owner %in% c("KWB", "SEN", "BWB")) 
+  if (! owner %in% c("KWB", "SEN", "BWB")) {
     stop(msg)
+  }
 }
 
 # .check.qua.level -------------------------------------------------------------
