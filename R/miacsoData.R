@@ -139,13 +139,13 @@ hsMoniPoints <- function
       mps <- matrix(c("STA", "Stallstr",
                       "MUE", "Muehlendamm",
                       "TEG", "Tegeler Weg"), ncol = 2, byrow = TRUE)
-    }
-    else if (owner == "SEN") {
+    } else if (owner == "SEN") {
       # Names of senate monitoring points are found in tbl_Messstellen
-      mps <- hsGetTable(qmdb("r", "STA", owner = "SEN"), "tbl_Messstellen", 
-                        fields = "Abkuerzung, Langname", dbg = FALSE)
-    }
-    else {
+      mps <- kwb.db::hsGetTable(
+        qmdb("r", "STA", owner = "SEN"), "tbl_Messstellen", 
+        fields = "Abkuerzung, Langname", dbg = FALSE
+      )
+    } else {
       mps <- matrix() # stop("No data of owner BWB available.\n")
     }
   }
@@ -298,7 +298,7 @@ hsReadMiaMdbs <- function # read MIA-CSO databases
   mdbFields <- "mdbFile, mdbDesc, mdbDir, mdbAttrib"
   
   # Read mdb info from R meta db
-  dfMdbs <- hsGetTable(mmdb(), "tblMdbs", fields = mdbFields, dbg = dbg)
+  dfMdbs <- kwb.db::hsGetTable(mmdb(), "tblMdbs", fields = mdbFields, dbg = dbg)
   
   # Update mdb path info if it is requested to search for new databases
   if (isTRUE(search.new)) {
@@ -308,7 +308,7 @@ hsReadMiaMdbs <- function # read MIA-CSO databases
     # if database paths have been added reread mdb info from meta db
     if (nNew > 0) {
       cat(nNew, "database paths have been added.\n")
-      dfMdbs <- hsGetTable(mmdb(), "tblMdbs", fields = mdbFields)    
+      dfMdbs <- kwb.db::hsGetTable(mmdb(), "tblMdbs", fields = mdbFields)    
     }
   }
   
@@ -366,16 +366,16 @@ hsUpdateMiaMdbs <- function # hsUpdateMiaMdbs
                        mdbDesc = sprintf("imported by R on %s", Sys.time()))
   
   # Create a new table tblTmpMdbsNew in R meta db... 
-  hsPutTable(mmdb(), dfMdbs, "tblTmpMdbsNew")
+  kwb.db::hsPutTable(mmdb(), dfMdbs, "tblTmpMdbsNew")
   
   # ... append its records to tblMdbs
   sql <- paste("INSERT INTO tblMdbs(mdbDir, mdbFile, mdbDesc) ",
                "SELECT mdbDir, mdbFile, mdbDesc FROM tblTmpMdbsNew")
   
-  hsSqlQuery(mmdb(), sql)
+  kwb.db::hsSqlQuery(mmdb(), sql)
   
   # ... and delete the temporarily created table tblTmpMdbsNew
-  hsDropTable(mmdb(), "tblTmpMdbsNew")
+  kwb.db::hsDropTable(mmdb(), "tblTmpMdbsNew")
   
   # Return number n of added database paths
   n
@@ -524,7 +524,7 @@ hsPars <- function
         
         # Take available parameter names from table field names in
         # raw database table
-        fields <- hsFields(ds$mdb, ds$tbl, dbg = dbg)
+        fields <- kwb.db::hsFields(ds$mdb, ds$tbl, dbg = dbg)
         
         # Exclude the first column (timestamp)
         fields[2:length(fields)]
@@ -532,7 +532,7 @@ hsPars <- function
       else if (qua.level == "v") {
         # Take available parameter names from table names in valid database
         mdb <- miamdb(kind, moniPoint, qua.level = "v")
-        tables <- hsTables(mdb) # all table names
+        tables <- kwb.db::hsTables(mdb) # all table names
         
         # Search for tables "KWB_<moniPoint>_ScanPar_<parName>_VAL" and
         # cut the <parName>
@@ -608,16 +608,17 @@ hsGetFpAndValRaw <- function
   pars <- paste(parNames, collapse = ",")
   
   # Generate SQL string
-  sql <- sprintf("SELECT myDateTime, %s, %s FROM %s WHERE %s AND %s",
-                 pars, fields, tbl,
-                 sprintf("NOT (%s)", hsSqlExOr(parNames, "IsNull")), # validity condition
-                 hsSqlExTimeCond("myDateTime", 
-                                 dateFirst = firstDate, 
-                                 dateLast = lastDate) # Time interval condition
+  sql <- sprintf(
+    "SELECT myDateTime, %s, %s FROM %s WHERE %s AND %s",
+    pars, fields, tbl,
+    sprintf("NOT (%s)", kwb.db::hsSqlExOr(parNames, "IsNull")), # validity condition
+    kwb.db::hsSqlExTimeCond(
+      "myDateTime", dateFirst = firstDate, dateLast = lastDate
+    ) # Time interval condition
   )
   
   # Run the SQL query
-  res <- hsSqlQuery(mdb, sql)
+  res <- kwb.db::hsSqlQuery(mdb, sql)
   
   # Return the query result as a matrix
   #data.matrix(res)
@@ -679,7 +680,7 @@ hsGetValData <- function
   ## Run the SQL query
   #myData <- sqlQuery(channel, sql)
   #myData
-  hsSqlQuery(src$mdb, sql)
+  kwb.db::hsSqlQuery(src$mdb, sql)
   ### data.frame containing validated data
 }
 

@@ -25,12 +25,18 @@ hsPlotAllDataAvailabilities <- function # plot all MIA CSO data availabilities
     
     # Open PDF graphics device
     #@2011-12-19: use hsPrepPdf
-    hsPrepPdf(pdf, boolLandscape = FALSE, bordW = 2*2.41, bordH = 2*2.7)
+    kwb.utils::preparePdf(
+      pdf, landscape = FALSE, borderWidth.cm = 2*2.41, borderHeight.cm = 2*2.7
+    )
     
     # mfrow: Prepare a grid of n x 1 plots with n being the number of parameters
     # mar: original margins plus 2 more lines at the bottom and 1 more on top
     # xpd: to allow legend to be outside of the plot region
-    par(mfrow=c(length(moniPoints), 1), mar=par()$mar + c(2,0,1,0), xpd=TRUE)
+    graphics::par(
+      mfrow = c(length(moniPoints), 1), 
+      mar = graphics::par()$mar + c(2, 0, 1, 0), 
+      xpd = TRUE
+    )
     
     # Loop through different time periods
     for (i in 1:(length(dates) - 1)) {
@@ -41,7 +47,7 @@ hsPlotAllDataAvailabilities <- function # plot all MIA CSO data availabilities
     }
     
     # Close PDF file
-    dev.off()    
+    grDevices::dev.off()    
   }
 }#,
 # ex = function() {
@@ -110,12 +116,14 @@ hsPlotMiaCsoAvailabilities <- function
   # Add a legend to the plot...
   # inset=-0.1: 10% of plot height above the plot
   #@2011-12-19: adapt the legend to the type of the data status
-  legend("top", legend = legTxt, fill = legCol, border = "white", box.col = NA, 
-         inset = -0.15, horiz = TRUE)
+  graphics::legend(
+    "top", legend = legTxt, fill = legCol, border = "white", box.col = NA, 
+      inset = -0.15, horiz = TRUE
+  )
   
   # Add horizontal lines at 0% and 100%
   # xpd=FALSE: only show inside plot area
-  abline(h = c(0,100), xpd = FALSE, col = "lightgrey")
+  graphics::abline(h = c(0,100), xpd = FALSE, col = "lightgrey")
 }
 
 # hsMiaCsoDataAvailability -----------------------------------------------------
@@ -149,8 +157,10 @@ hsMiaCsoDataAvailability <- structure(
     #@2012-04-13;HSB;use hsDataAvailability instead of .old
     if (! is.null(dateFirst)) dateFirst = as.character(dateFirst)
     if (! is.null(dateLast))  dateLast  = as.character(dateLast)
-    data <- hsMdbTimeSeries(info$mdb, info$tbl, info$tsField, info$parField,
-                            minDate = dateFirst, maxDate = dateLast)
+    data <- kwb.db::hsMdbTimeSeries(
+      info$mdb, info$tbl, info$tsField, info$parField,
+      minDate = dateFirst, maxDate = dateLast
+    )
     hsDataAvailability(data, tstep, includeCount = FALSE, dbg = dbg)
     
     ## Redirect to hsDataAvailability.old
