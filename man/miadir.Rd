@@ -5,7 +5,7 @@
 \title{Experimental!}
 \usage{
 miadir(owner = NA, kind = NA, quaLevel = NA, resol = NA,
-  DS = hsDirStructure(dbg = dbg), depth = 1, dbg = FALSE)
+  DS = kwb.misc::hsDirStructure(dbg = dbg), depth = 1, dbg = FALSE)
 }
 \arguments{
 \item{owner}{data owner}

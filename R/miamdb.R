@@ -3,6 +3,7 @@
 #' MS Access Databases (Hydraulic Data)
 #' 
 #' @param \dots arguments passed to \code{\link{miamdb}}
+#' @export
 hmdb <- function(...)
 {
   miamdb('h', ...) 
@@ -13,6 +14,7 @@ hmdb <- function(...)
 #' MS Access Databases (Water Quality Data) 
 #' 
 #' @param \dots arguments passed to \code{\link{miamdb}}
+#' @export
 qmdb <- function(...)
 {
   miamdb('q', ...) 
@@ -23,6 +25,7 @@ qmdb <- function(...)
 #' MS Access Databases (Rain Data) 
 #' 
 #' @param \dots arguments passed to \code{\link{miamdb}}
+#' @export
 rmdb <- function(...)
 {
   miamdb('r', ...) 
@@ -40,6 +43,7 @@ rmdb <- function(...)
 #' @param owner owner of the data, one of "KWB", "SEN", "BWB"
 #' @return This function returns the full path to the Access database containing
 #'   the specified kind of data
+#' @export
 miamdb <- function(
   kind = NULL, moniPoint = NULL, qua.level = NULL, owner = "KWB"
 ) 

@@ -10,6 +10,7 @@
 #' @param moniPoint Name of monitoring point, e.g. "TEG", "STA", "MUE"
 #' @return Last wavelength being provided by spectrometer at given monitoring
 #'   point
+#' @export
 hsLastWL <- function(moniPoint)
 {
   lastWL <- ifelse(
@@ -35,6 +36,7 @@ hsLastWL <- function(moniPoint)
 #' 
 #' @param i Index (i = 1: 200nm, i = 2: 202.5nm, ..., i = 217: 740nm)
 #' @return Wavelength corresponding to index
+#' @export
 hsWavelengthAtIndex <- function(i)
 {
   200 + (i - 1) * 2.5
@@ -52,6 +54,7 @@ hsWavelengthAtIndex <- function(i)
 #' @param wavelength Wavelength for which corresponding index shall be
 #'   determined
 #' @return Index corresponding the given wavelength
+#' @export
 hsIndexOfWavelength <- function(wavelength) 
 {
   (wavelength - 200) / 2.5 + 1

@@ -7,6 +7,7 @@
 #' @param kind kind of data: "q" = water quality, "h" = hydraulic data, "r" =
 #'   rain
 #' @param owner owner of the data, one of "KWB", "SEN", "BWB"
+#' @export
 hsMoniPoints <- function(kind = NULL, owner = "KWB") 
 {  
   .check.kind(kind)   # stop if kind value is invalid
@@ -50,9 +51,10 @@ hsMoniPoints <- function(kind = NULL, owner = "KWB")
 #' @param DS directory structure
 #' @param depth depth
 #' @param dbg whether to show debug messages or not
+#' @export
 miadir <- function(
   owner = NA, kind = NA, quaLevel = NA, resol = NA, 
-  DS = hsDirStructure(dbg = dbg), depth = 1, dbg = FALSE
+  DS = kwb.misc::hsDirStructure(dbg = dbg), depth = 1, dbg = FALSE
 )
 {
   #  hsdbg()  
@@ -147,6 +149,7 @@ miadir <- function(
 #'   given the user is asked to enter a number on the console.
 #' @return full path to database file or empty string \code{""} if an invalid
 #'   \code{id} was given.
+#' @export
 miamdb2 <- function(id = 0)
 {  
   # Read available MIA-CSO databases
@@ -180,6 +183,7 @@ miamdb2 <- function(id = 0)
 #'   databases; if FALSE databases are read from R meta database
 #' @param dbg whether to show debug messages or not
 #' @return data frame with columns \code{mdbFile}, \code{mdbDesc}, \code{mdbDir}
+#' @export
 hsReadMiaMdbs <- function(
   root, # = "//moby/miacso$/Daten/ACCESS", 
   search.new = FALSE, dbg = FALSE
@@ -188,7 +192,9 @@ hsReadMiaMdbs <- function(
   mdbFields <- "mdbFile, mdbDesc, mdbDir, mdbAttrib"
   
   # Read mdb info from R meta db
-  dfMdbs <- kwb.db::hsGetTable(mmdb(), "tblMdbs", fields = mdbFields, dbg = dbg)
+  dfMdbs <- kwb.db::hsGetTable(
+    kwb.misc::mmdb(), "tblMdbs", fields = mdbFields, dbg = dbg
+  )
   
   # Update mdb path info if it is requested to search for new databases
   if (isTRUE(search.new)) {
@@ -198,7 +204,9 @@ hsReadMiaMdbs <- function(
     # if database paths have been added reread mdb info from meta db
     if (nNew > 0) {
       cat(nNew, "database paths have been added.\n")
-      dfMdbs <- kwb.db::hsGetTable(mmdb(), "tblMdbs", fields = mdbFields)    
+      dfMdbs <- kwb.db::hsGetTable(
+        kwb.misc::mmdb(), "tblMdbs", fields = mdbFields
+      )
     }
   }
   
@@ -214,6 +222,7 @@ hsReadMiaMdbs <- function(
 #' @param root path to directory from which to start looking recursively for 
 #'   MS Access database files
 #' @return Return number n of added database paths
+#' @export
 hsUpdateMiaMdbs <- function(dfMdbs, root) 
 {  
   # Create full paths to currently known dbs
@@ -262,7 +271,7 @@ hsUpdateMiaMdbs <- function(dfMdbs, root)
   )
   
   # Create a new table tblTmpMdbsNew in R meta db... 
-  kwb.db::hsPutTable(mmdb(), dfMdbs, "tblTmpMdbsNew")
+  kwb.db::hsPutTable(kwb.misc::mmdb(), dfMdbs, "tblTmpMdbsNew")
   
   # ... append its records to tblMdbs
   sql <- paste(
@@ -270,10 +279,10 @@ hsUpdateMiaMdbs <- function(dfMdbs, root)
     "SELECT mdbDir, mdbFile, mdbDesc FROM tblTmpMdbsNew"
   )
   
-  kwb.db::hsSqlQuery(mmdb(), sql)
+  kwb.db::hsSqlQuery(kwb.misc::mmdb(), sql)
   
   # ... and delete the temporarily created table tblTmpMdbsNew
-  kwb.db::hsDropTable(mmdb(), "tblTmpMdbsNew")
+  kwb.db::hsDropTable(kwb.misc::mmdb(), "tblTmpMdbsNew")
   
   # Return number n of added database paths
   n
@@ -306,6 +315,7 @@ hsUpdateMiaMdbs <- function(dfMdbs, root)
 #'   \item \code{tsField}: name of timestamp field, 
 #'   \item \code{parField}: name of parameter field
 #' }
+#' @export
 #' @examples 
 #' # Get source information of validated data of parameter AFS from Stallstr. 
 #' si <- hsDataSource("v", "STA", "AFS")
@@ -422,6 +432,7 @@ hsDataSource <- function(
 #' @param owner owner of the data, one of "KWB", "SEN", "BWB"
 #' @param dbg whether to show debug messages or not
 #' @return Returns the names of available parameters
+#' @export
 hsPars <- function(
   kind = NULL, moniPoint = NULL, qua.level = "c", owner = "KWB", dbg = TRUE
 )
@@ -490,6 +501,7 @@ hsPars <- function(
 #' @return Return the query result as a new data.frame (which is a special type
 #'   of a list) with elements "dts" (date-times), "pars" (parameter values) and
 #'   "fps" (fingerprints)
+#' @export
 hsGetFpAndValRaw <- function(
   moniPoint, parNames, year, firstDate, lastDate, home = FALSE
 ) 
@@ -568,6 +580,7 @@ hsGetFpAndValRaw <- function(
 #' @param firstDate first date to be selected as "mm/dd/yyyy hh:nn:ss"
 #' @param lastDate last date to be selected as "mm/dd/yyyy hh:nn:ss"
 #' @return data.frame containing validated data
+#' @export
 hsGetValData <- function(moniPoint, parName, firstDate, lastDate)
 {
   if (missing(moniPoint)) {
@@ -620,6 +633,7 @@ hsGetValData <- function(moniPoint, parName, firstDate, lastDate)
 #' @param moniPoint acronym of monitoring point: "STA", "TEG" or "MUE"
 #' @return String representing comma separated list of fields in fingerprint
 #'   table
+#' @export
 hsFpFields <- function(moniPoint)
 {
   sprintf("e%s", paste(seq(200, hsLastWL(moniPoint), 2.5), collapse = ",e"))
