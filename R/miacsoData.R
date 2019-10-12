@@ -140,6 +140,13 @@ miadir <- function(
 }
 
 # miamdb2 ----------------------------------------------------------------------
+
+#' Full Path to MIA CSO Database File
+#' 
+#' @param id optional. Integer number identifying the database file. If not 
+#'   given the user is asked to enter a number on the console.
+#' @return full path to database file or empty string \code{""} if an invalid
+#'   \code{id} was given.
 miamdb2 <- function(id = 0)
 {  
   # Read available MIA-CSO databases
