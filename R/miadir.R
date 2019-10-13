@@ -20,7 +20,7 @@ miadir <- function(
 )
 {
   #  hsdbg()  
-  
+  #kind=NA;quaLevel=NA;resol=NA;depth=1;dbg=TRUE
   msg <- sprintf(
     "owner = '%s', kind = '%s', qua.level = '%s', resol = '%s', depth = %d",
     owner, kind, quaLevel, resol, depth
@@ -42,7 +42,8 @@ miadir <- function(
   rec <- DS
   
   for (argname in c("owner", "kind", "quaLevel", "resol")) {
-    
+  
+    #argname <- "owner"  
     argval = get(argname)
     
     if (! is.na(argval)) {
@@ -93,7 +94,8 @@ miadir <- function(
     quaLevel = as.character(context[3]), 
     resol = as.character(context[4]), 
     depth = depth + 1, 
-    dbg = dbg
+    dbg = dbg,
+    DS = DS
   )
   
   file.path(resdir, subdir)
