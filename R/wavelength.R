@@ -13,16 +13,11 @@
 #' @export
 hsLastWL <- function(moniPoint)
 {
-  lastWL <- ifelse(
-    moniPoint == "TEG", 750, ifelse(
-      moniPoint == "STA", 740, ifelse(
-        moniPoint == "MUE", 732.5, 0
-      )
-    )
-  )
-  
-  if (lastWL == 0) {
+  lastWL <- list(TEG = 750, STA = 740, MUE = 732.5)[[moniPoint]]
+
+  if (is.null(lastWL)) {
     print(paste("Unknown monitoring point:", moniPoint))
+    lastWL <- 0
   }
   
   lastWL

@@ -1,6 +1,6 @@
 # hsPlotAllDataAvailabilities --------------------------------------------------
 
-#' lot all MIA CSO Data Availabilities
+#' Plot all MIA CSO Data Availabilities
 #' 
 #' Plots availability of raw and validated data for different monitoring points
 #' and parameters. For each monitoring point a pdf file
@@ -40,10 +40,10 @@ hsPlotAllDataAvailabilities <- function(moniPoints, parNames, dates, pdfDir)
   for (moniPoint in moniPoints) {
     
     pdf <- file.path(pdfDir, sprintf("hsDataAvailability_%s.pdf", moniPoint))
+    
     cat("Writing plots to ", pdf, "...\n")
     
     # Open PDF graphics device
-    #@2011-12-19: use hsPrepPdf
     kwb.utils::preparePdf(
       pdf, landscape = FALSE, borderWidth.cm = 2*2.41, borderHeight.cm = 2*2.7
     )
@@ -58,15 +58,18 @@ hsPlotAllDataAvailabilities <- function(moniPoints, parNames, dates, pdfDir)
     )
     
     # Loop through different time periods
-    for (i in 1:(length(dates) - 1)) {
-      for (parName in parNames) {      
+    for (i in seq_len(length(dates) - 1)) {
+      
+      for (parName in parNames) {
+        
         hsPlotMiaCsoAvailabilities(
-          c("r", "v"), moniPoint, parName, dates[i], dates[i+1])
+          c("r", "v"), moniPoint, parName, dates[i], dates[i + 1]
+        )
       }
     }
     
     # Close PDF file
-    grDevices::dev.off()    
+    grDevices::dev.off()
   }
 }
 
@@ -86,9 +89,14 @@ hsPlotMiaCsoAvailabilities <- function(
 ) 
 {
   cat(
-    "Plotting data availability of", parName, 
-    "at monitoring point", moniPoint, 
-    "within [", format.Date(dateFirst), ",", format.Date(dateLast), "]", "\n"
+    sprintf(
+      "Plotting data availability of %s at monitoring point %s", 
+      parName, moniPoint
+    ),
+    sprintf(
+      "within [ %s , %s ]\n", 
+      format.Date(dateFirst), format.Date(dateLast)
+    )
   )
   
   legTxt <- NULL
@@ -102,13 +110,15 @@ hsPlotMiaCsoAvailabilities <- function(
     ) 
     
     # Set plot title
-    main <- paste(
-      "Daily data availability of parameter", parName, 
-      "at monitoring point", moniPoint
+    main <- sprintf(
+      "Daily data availability of parameter %s at monitoring point", 
+      parName, moniPoint
     )
     
     # Set bar color according to type
-    barCol <- switch(qType, r = "lightgreen", v = "darkgreen", c = "lightyellow")
+    barCol <- switch(
+      qType, r = "lightgreen", v = "darkgreen", c = "lightyellow"
+    )
     
     # Plot the availabilities
     kwb.misc::hsPlotDataAvailability(
@@ -119,27 +129,23 @@ hsPlotMiaCsoAvailabilities <- function(
     
     # Append type name/colour to list of legend texts/colours
     legTxt <- c(
-      legTxt, ifelse(
-        qType == "r", "raw data", ifelse(
-          qType == "v", "validated data", "calibrated data"
-        )
-      )
+      legTxt, 
+      c(r = "raw data", v = "validated data", c = "calibrated data")[qType]
     )
     
     legCol <- c(legCol, barCol)
   }  
   
   # Add a legend to the plot...
-  # inset=-0.1: 10% of plot height above the plot
-  #@2011-12-19: adapt the legend to the type of the data status
+  # inset = -0.15: 15% of plot height above the plot
   graphics::legend(
     "top", legend = legTxt, fill = legCol, border = "white", box.col = NA, 
     inset = -0.15, horiz = TRUE
   )
   
   # Add horizontal lines at 0% and 100%
-  # xpd=FALSE: only show inside plot area
-  graphics::abline(h = c(0,100), xpd = FALSE, col = "lightgrey")
+  # xpd = FALSE: only show inside plot area
+  graphics::abline(h = c(0, 100), xpd = FALSE, col = "lightgrey")
 }
 
 # hsMiaCsoDataAvailability -----------------------------------------------------
@@ -182,12 +188,20 @@ hsMiaCsoDataAvailability <- function(
 )
 { 
   # Get information on where to find the data (path to db, table name, ...)
-  info <- hsDataSource(qua.level = level, moniPoint = moniPoint, 
-                       parName = parName)
+  info <- hsDataSource(
+    qua.level = level, 
+    moniPoint = moniPoint, 
+    parName = parName
+  )
   
   #@2012-04-13;HSB;use hsDataAvailability instead of .old
-  if (! is.null(dateFirst)) dateFirst = as.character(dateFirst)
-  if (! is.null(dateLast))  dateLast  = as.character(dateLast)
+  if (! is.null(dateFirst)) {
+    dateFirst <- as.character(dateFirst)
+  }
+  
+  if (! is.null(dateLast)) {
+    dateLast <- as.character(dateLast)
+  }
   
   data <- kwb.db::hsMdbTimeSeries(
     info$mdb, info$tbl, info$tsField, info$parField,
@@ -195,7 +209,5 @@ hsMiaCsoDataAvailability <- function(
   )
   
   kwb.misc::hsDataAvailability(data, tstep, includeCount = FALSE, dbg = dbg)
-  
-  ## Redirect to hsDataAvailability.old
   #kwb.misc::hsDataAvailability.old(info, dateFirst, dateLast, dbg = dbg)  
 }

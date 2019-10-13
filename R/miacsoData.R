@@ -10,8 +10,9 @@
 #' @export
 hsMoniPoints <- function(kind = NULL, owner = "KWB") 
 {  
-  .check.kind(kind)   # stop if kind value is invalid
-  .check.owner(owner) # stop if owner value is invalid
+  # Stop on invalid inputs
+  .check.kind(kind)
+  .check.owner(owner)
   
   if (kind == "h") {
     clean_stop("monitoring points of hydraulic data not yet implemented.\n")
@@ -79,8 +80,10 @@ miadir <- function(
   kwb.utils::catIf(dbg, "in miadir(", msg, ")\n")
 
   if (depth > 10) {
-    clean_stop("Maximum recursion depth (10) reached. Check tblDirStruct for endless ",
-         "loops during recursive path resolution.\n")    
+    clean_stop(
+      "Maximum recursion depth (10) reached. Check tblDirStruct for endless ",
+      "loops during recursive path resolution.\n"
+    )
   }
   
   # number of criteria
@@ -98,6 +101,7 @@ miadir <- function(
       rec <- rec[! is.na(rec[[argname]]) & rec[[argname]] == argval, ]    
       
       cat(sprintf("After filtering for %s == %s:\n", argname, argval))
+      
       print(rec)            
     }
   }
@@ -107,8 +111,10 @@ miadir <- function(
   kwb.utils::printIf(dbg, rec, "filtered directory structure")
   
   if (nrow(rec) == 0) {
-    clean_stop("No directory specified for these criteria: ", msg, "\n",
-         "You need to specify at least one more criterion.\n")    
+    clean_stop(
+      "No directory specified for these criteria: ", msg, "\n",
+      "You need to specify at least one more criterion.\n"
+    )
   }
   
   if (nrow(rec) > 1) {
@@ -159,17 +165,27 @@ miamdb2 <- function(id = 0)
   mdbs <- hsReadMiaMdbs()
   
   # If no ID is given let the user chose an id from the list of available ids
-  if (id == 0) {  
+  if (id == 0) {
+    
     print(mdbs)
-    cat("*** Select a database from the list above by its number or '0' to quit: ")
+    
+    cat(
+      "*** Select a database from the list above by its number or '0' to quit: "
+    )
+    
     id <- scan(n = 1, what = integer())
+    
     cat(sprintf("Your choice: '%d'\n", id))
   }
   
   # Return an empty string if the id is invalid
   if (! id %in% seq_len(nrow(mdbs))) {
-    cat("Invalid database id. Run miamdb2() without arguments to get",
-        "a list of available ids.\n")
+    
+    cat(
+      "Invalid database id. Run miamdb2() without arguments to get a list of",
+      "available ids.\n"
+    )
+    
     return("")
   }
   
@@ -208,7 +224,9 @@ hsReadMiaMdbs <- function(
     
     # if database paths have been added reread mdb info from meta db
     if (nNew > 0) {
+      
       cat(nNew, "database paths have been added.\n")
+      
       dfMdbs <- kwb.db::hsGetTable(meta_db, "tblMdbs", fields = mdbFields)
     }
   }
@@ -247,6 +265,7 @@ hsUpdateMiaMdbs <- function(dfMdbs, root)
   
   # Return 0 to indicate that there are no new databases
   if (n == 0) {
+    
     return(0)
   }
   
@@ -265,6 +284,7 @@ hsUpdateMiaMdbs <- function(dfMdbs, root)
   
   # Return 0 (no new databases appended) if the user did not answer "Yes"
   if (answer != "Y") {
+    
     return(0)
   }
   
@@ -347,7 +367,10 @@ hsDataSource <- function(
 ) 
 {
   basePath <- "//moby/miacso$/Daten/ACCESS/KwbMonitoring"
-  tbl <- tsField <- parField <- ""
+  
+  tbl <- ""
+  tsField <- ""
+  parField <- ""
   
   #  if (missing(qua.level)) {
   #    msg <- paste("\nUsage: hsDataSource(qua.level, moniPoint, parName)",
@@ -364,9 +387,9 @@ hsDataSource <- function(
   #  }
   
   .check.owner(owner)
-  .check.kind(kind) # stop if kind value is invalid
-  .check.qua.level(qua.level) # stop if qua.level value is invalid
-  .check.moniPoint(moniPoint, kind = kind, owner = owner) # stop if monitoring point is invalid
+  .check.kind(kind) 
+  .check.qua.level(qua.level)
+  .check.moniPoint(moniPoint, kind = kind, owner = owner)
   
   ## provide meta data in data frame "info"
   info <- data.frame(
@@ -385,38 +408,42 @@ hsDataSource <- function(
   
   kwb.utils::printIf(dbg, info)
   
-  if (kind == "q") { 
-    
-    if (owner == "KWB") {
-      
-      ## Select row of meta data
-      infoRow <- info[
-        info$kind == kind & info$owner == owner & info$qua.level == qua.level, ]
-      
-      tbl      <- sprintf(infoRow$tblPtrn, moniPoint, parName)
-      tsField  <- infoRow$tsField
-      parField <- sprintf(infoRow$parFieldPtrn, parName)
-      
-      kwb.utils::printIf(dbg, infoRow)
-      kwb.utils::catIf(dbg, sprintf(
-        "tbl: %s\ntsField: %s\nparField: %s\n", tbl, tsField, parField
-      ))
-      
-    } else if (owner == "SEN") {
-      
-    }
-    
-  } else if (kind == "h") {
-    
+  if (kind == "h") {
     clean_stop("data sources for hydraulic data not yet implemented.\n")
-    
-  } else if (kind == "r") {
-    
+  } 
+  
+  if (kind == "r") {
     clean_stop("data sources for rain data not yet implemented.\n")
   }
   
+  # Here the kind is expected to be "q" (quality)
+  stopifnot(kind == "q")
+
+  if (owner == "KWB") {
+    
+    ## Select row of meta data
+    selected <- info$kind == kind & 
+      info$owner == owner & 
+      info$qua.level == qua.level
+    
+    infoRow <- info[selected, ]
+    
+    tbl <- sprintf(infoRow$tblPtrn, moniPoint, parName)
+    tsField <- infoRow$tsField
+    parField <- sprintf(infoRow$parFieldPtrn, parName)
+    
+    kwb.utils::printIf(dbg, infoRow)
+    kwb.utils::catIf(dbg, sprintf(
+      "tbl: %s\ntsField: %s\nparField: %s\n", tbl, tsField, parField
+    ))
+    
+  } else if (owner == "SEN") {
+    
+  }
+  
   # Return source info
-  mdb <- miamdb(kind, moniPoint, qua.level, owner) 
+  mdb <- miamdb(kind, moniPoint, qua.level, owner)
+  
   list(mdb = mdb, tbl = tbl, tsField = tsField, parField = parField)
 }
 
@@ -438,9 +465,9 @@ hsPars <- function(
 )
 {
   .check.owner(owner)
-  .check.kind(kind) # stop if kind value is invalid
-  .check.moniPoint(moniPoint, kind = kind, owner = owner) # stop if monitoring point is invalid
-  .check.qua.level(qua.level) # stop if qua.level value is invalid
+  .check.kind(kind)
+  .check.moniPoint(moniPoint, kind = kind, owner = owner)
+  .check.qua.level(qua.level)
   
   if (kind == "q") { # water quality parameters
     
@@ -467,8 +494,12 @@ hsPars <- function(
         
         # Search for tables "KWB_<moniPoint>_ScanPar_<parName>_VAL" and
         # cut the <parName>
-        ptrn <- sprintf("^KWB_%s_ScanPar_(.*)_VAL$", moniPoint) # Search pattern
-        if (dbg) cat("pattern: ", ptrn, "\n")
+        
+        # Search pattern
+        ptrn <- sprintf("^KWB_%s_ScanPar_(.*)_VAL$", moniPoint)
+        
+        kwb.utils::catIf(dbg, "pattern: ", ptrn, "\n")
+        
         gsub(ptrn, "\\1", grep(ptrn, tables, value = TRUE))
         
       } else {
@@ -509,9 +540,12 @@ hsGetFpAndValRaw <- function(
 ) 
 {
   if (missing(moniPoint)) {
+    
     msg <- paste(
-      "\nUsage: hsGetFpAndValRaw(moniPoint, parNames, year, firstDate, lastDate)",
-      "  moniPoint: acronym of monitoring point: \"STA\" (Stallstr.), \"TEG\" (Tegeler Weg) or \"MUE\" (Muehlendamm)",
+      "\nUsage: hsGetFpAndValRaw(moniPoint, parNames, year, firstDate,",
+      "lastDate)",
+      "  moniPoint: acronym of monitoring point: \"STA\" (Stallstr.),", 
+      "\"TEG\" (Tegeler Weg) or \"MUE\" (Muehlendamm)",
       "  parNames: vector of parameter names, e.g. c(\"AFS\", \"CSB\")",
       "  year: year of which data is requested",
       "  firstDate: first date of requested time period (mm/dd/yyyy)",
@@ -534,10 +568,10 @@ hsGetFpAndValRaw <- function(
   
   mdbFullPath <- ifelse(
     home,
-    file.path("D:", "_Hauke", "tmp", mdb),
+    file.path("D:/_Hauke/tmp", mdb),
     file.path(
-      "C:", "Users", "hsonne", "_EigeneDateien", "_Projekte_lokal", 
-      "_Projekt_MIA_CSO_lokal", "DbDevelopment", "DbData", "RAW_Scan", mdb
+      "C:/Users/hsonne/_EigeneDateien/_Projekte_lokal/_Projekt_MIA_CSO_lokal", 
+      "DbDevelopment/DbData/RAW_Scan", mdb
     )
   )
   
@@ -549,7 +583,8 @@ hsGetFpAndValRaw <- function(
   sql <- sprintf(
     "SELECT myDateTime, %s, %s FROM %s WHERE %s AND %s",
     pars, fields, tbl,
-    sprintf("NOT (%s)", kwb.db::hsSqlExOr(parNames, "IsNull")), # validity condition
+    # validity condition
+    sprintf("NOT (%s)", kwb.db::hsSqlExOr(parNames, "IsNull")), 
     kwb.db::hsSqlExTimeCond(
       "myDateTime", dateFirst = firstDate, dateLast = lastDate
     ) # Time interval condition
@@ -567,8 +602,9 @@ hsGetFpAndValRaw <- function(
   i <- 1 + length(pars)
   
   list(
-    dts = res[,1], pars = as.data.frame(res[pars]),
-    fps = as.matrix(res[,(i+1):ncol(res)])
+    dts = res[, 1], 
+    pars = as.data.frame(res[pars]),
+    fps = as.matrix(res[, (i + 1):ncol(res)])
   )
 }
 
@@ -590,11 +626,13 @@ hsGetValData <- function(moniPoint, parName, firstDate, lastDate)
     
     msg <- paste(
       "\nUsage: hsGetValData(moniPoint, parName, firstDate, lastDate)",
-      "  moniPoint: acronym of monitoring point: \"STA\" (Stallstr.), \"TEG\" (Tegeler Weg) or \"MUE\" (Muehlendamm)",
+      "  moniPoint: acronym of monitoring point: \"STA\" (Stallstr.),",
+      "\"TEG\" (Tegeler Weg) or \"MUE\" (Muehlendamm)",
       "  parName:     parameter name, e.g. \"AFS\"",
       "  firstDate: first date of requested time period (mm/dd/yyyy)",
       "  lastDate:  last date of requested time period (mm/dd/yyyy)",
-      "Returns a data.frame containing the validated data, directly drawn from the current databases.",
+      "Returns a data.frame containing the validated data, directly drawn from",
+      "the current databases.",
       sep = "\n"
     )
     
@@ -624,8 +662,6 @@ hsGetValData <- function(moniPoint, parName, firstDate, lastDate)
   print(sql)
   
   ## Run the SQL query
-  #myData <- sqlQuery(channel, sql)
-  #myData
   kwb.db::hsSqlQuery(src$mdb, sql)
 }
 

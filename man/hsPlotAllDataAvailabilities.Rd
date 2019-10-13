@@ -2,7 +2,7 @@
 % Please edit documentation in R/miacsoDataAvailability.R
 \name{hsPlotAllDataAvailabilities}
 \alias{hsPlotAllDataAvailabilities}
-\title{lot all MIA CSO Data Availabilities}
+\title{Plot all MIA CSO Data Availabilities}
 \usage{
 hsPlotAllDataAvailabilities(moniPoints, parNames, dates, pdfDir)
 }

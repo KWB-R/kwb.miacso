@@ -48,33 +48,54 @@ miamdb <- function(
   kind = NULL, moniPoint = NULL, qua.level = NULL, owner = "KWB"
 ) 
 {  
-  .check.kind(kind)           # stop if kind value is invalid
-  .check.owner(owner)         # stop if owner value is invalid
-  .check.qua.level(qua.level) # stop if qua.level value is invalid
+  # Stop on invalid inputs
+  .check.kind(kind)
+  .check.owner(owner)
+  .check.qua.level(qua.level)
   
   # For KWB own data we need the monitoring point and the data quality level
   # in order to find the correct database
   if (owner == "KWB") {
-    .check.moniPoint(moniPoint, kind = kind, owner = owner) # stop if monitoring point is invalid
+    # stop if monitoring point is invalid
+    .check.moniPoint(moniPoint, kind = kind, owner = owner)
   }
   
-  if (kind == "q") { # water quality data
-    if (owner == "KWB") {
-      file.path("//moby/miacso$/Daten/ACCESS/KwbMonitoring", 
-                switch(EXPR = qua.level, r = sprintf("1RAW/KWB_JoinedData.mdb"),
-                       v = sprintf("2VAL/KWB_%s_VAL.mdb", moniPoint),
-                       c = sprintf("3CAL/KWB_CAL.mdb")))
-    } else if (owner == "SEN") {
-      cat("WARNING: no distinction between raw, valid and calibrated data for owner 'SEN'.\n")
-      file.path("//moby/miacso$/Daten/ACCESS/Gewaesserguete/kontinuierlich",
-                "Messreihen", "Hauptparameter_Senat.mdb")
-    } else {
-      stop("No water quality data of owner BWB available.\n")      
-    }
-  } else if (kind == "h") { # hydraulic data
-    stop("mdb paths for hydraulic data not yet implemented.\n")
-  } else if (kind == "r") {
-    stop("mdb paths for rain data not yet implemented.\n")
+  # Hydraulic data
+  if (kind == "h") {
+    clean_stop("mdb paths for hydraulic data not yet implemented.\n")
+  }
+  
+  # Rain data
+  if (kind == "r") {
+    clean_stop("mdb paths for rain data not yet implemented.\n")
+  }
+  
+  # Water quality data
+  stopifnot(kind == "q")
+  
+  if (owner == "KWB") {
+    
+    file.path("//moby/miacso$/Daten/ACCESS/KwbMonitoring", switch(
+      EXPR = qua.level, 
+      r = sprintf("1RAW/KWB_JoinedData.mdb"),
+      v = sprintf("2VAL/KWB_%s_VAL.mdb", moniPoint),
+      c = sprintf("3CAL/KWB_CAL.mdb")
+    ))
+    
+  } else if (owner == "SEN") {
+    
+    cat(
+      "WARNING: no distinction between raw, valid and calibrated data for",
+      "owner 'SEN'.\n"
+    )
+    
+    file.path(
+      "//moby/miacso$/Daten/ACCESS/Gewaesserguete/kontinuierlich/Messreihen", 
+      "Hauptparameter_Senat.mdb"
+    )
+    
+  } else {
+    
+    stop("No water quality data of owner BWB available.\n")      
   }
 }
-
