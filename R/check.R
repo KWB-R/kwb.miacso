@@ -15,6 +15,33 @@
   }
 }
 
+# .check.moniPoint -------------------------------------------------------------
+.check.moniPoint <- function(moniPoint = NULL, kind = NULL, owner = NULL) 
+{
+  .check.kind(kind)
+  .check.owner(owner)
+  
+  # get matrix with short and long names of monitoring points
+  mps <- hsMoniPoints(kind, owner = owner)
+  
+  # string list of monitoring points
+  mpl <- paste(sprintf("'%s' (%s)", mps[, 1], mps[, 2]), collapse = "\n  ")
+  
+  if (is.null(moniPoint)) {
+    clean_stop(
+      "No monitoring point 'moniPoint' given. ",
+      "Available monitoring points are:\n  ", mpl, "\n"
+    )
+  }
+  
+  if (! moniPoint %in% mps[, 1]) {
+    clean_stop(
+      "Monitoring point '", moniPoint, "' ",
+      "is not in the list of known monitoring points: ", mpl, "\n"
+    )
+  }
+}
+
 # .check.owner -----------------------------------------------------------------
 .check.owner <- function(owner = NULL) 
 {  
@@ -46,35 +73,3 @@
   }
 }
 
-# .check.moniPoint -------------------------------------------------------------
-.check.moniPoint <- function(moniPoint = NULL, kind = NULL, owner = NULL) 
-{
-  .check.kind(kind)
-  .check.owner(owner)
-  
-  # get matrix with short and long names of monitoring points
-  mps <- hsMoniPoints(kind, owner = owner)
-  
-  # string list of monitoring points
-  mpl <- paste(sprintf("'%s' (%s)", mps[, 1], mps[, 2]), collapse = "\n  ")
-
-  if (is.null(moniPoint)) {
-    clean_stop(
-      "No monitoring point 'moniPoint' given. ",
-      "Available monitoring points are:\n  ", mpl, "\n"
-    )
-  }
-  
-  if (! moniPoint %in% mps[, 1]) {
-    clean_stop(
-      "Monitoring point '", moniPoint, "' ",
-      "is not in the list of known monitoring points: ", mpl, "\n"
-    )
-  }
-}
-
-# clean_stop -------------------------------------------------------------------
-clean_stop <- function(...)
-{
-  stop(..., call. = FALSE)
-}
