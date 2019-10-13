@@ -15,3 +15,5 @@ Remotes:
     github::kwb-r/kwb.misc,
     github::kwb-r/kwb.utils
 RoxygenNote: 6.1.1
+Suggests: 
+    testthat
