@@ -51,7 +51,7 @@ hsDataSource <- function(
   dbg = FALSE
 ) 
 {
-  basePath <- "//moby/miacso$/Daten/ACCESS/KwbMonitoring"
+  basePath <- kwbMonitoringPath()
   
   tbl <- ""
   tsField <- ""

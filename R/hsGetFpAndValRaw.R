@@ -66,7 +66,7 @@ hsGetFpAndValRaw <- function(
     pars, fields, tbl,
     # validity condition
     sprintf("NOT (%s)", kwb.db::hsSqlExOr(parNames, "IsNull")), 
-    kwb.db::hsSqlExTimeCond(
+    kwb.db:::hsSqlExTimeCond(
       "myDateTime", dateFirst = firstDate, dateLast = lastDate
     ) # Time interval condition
   )

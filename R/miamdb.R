@@ -75,7 +75,7 @@ miamdb <- function(
   
   if (owner == "KWB") {
     
-    file.path("//moby/miacso$/Daten/ACCESS/KwbMonitoring", switch(
+    file.path(kwbMonitoringPath(), switch(
       EXPR = qua.level, 
       r = sprintf("1RAW/KWB_JoinedData.mdb"),
       v = sprintf("2VAL/KWB_%s_VAL.mdb", moniPoint),
@@ -90,8 +90,8 @@ miamdb <- function(
     )
     
     file.path(
-      "//moby/miacso$/Daten/ACCESS/Gewaesserguete/kontinuierlich/Messreihen", 
-      "Hauptparameter_Senat.mdb"
+      kwbMonitoringPath(), 
+      "../Gewaesserguete/kontinuierlich/Messreihen/Hauptparameter_Senat.mdb"
     )
     
   } else {

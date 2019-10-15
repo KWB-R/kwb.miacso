@@ -52,7 +52,7 @@ miamdb2 <- function(id = 0)
 #' @return data frame with columns \code{mdbFile}, \code{mdbDesc}, \code{mdbDir}
 #' @export
 hsReadMiaMdbs <- function(
-  root, # = "//moby/miacso$/Daten/ACCESS", 
+  root, # = dirname(kwbMonitoringPath()), 
   search.new = FALSE, dbg = FALSE
 ) 
 {
