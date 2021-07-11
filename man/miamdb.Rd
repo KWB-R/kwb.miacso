@@ -4,8 +4,7 @@
 \alias{miamdb}
 \title{Get Path to MS Access Database Used in MIA-CSO}
 \usage{
-miamdb(kind = NULL, moniPoint = NULL, qua.level = NULL,
-  owner = "KWB")
+miamdb(kind = NULL, moniPoint = NULL, qua.level = NULL, owner = "KWB")
 }
 \arguments{
 \item{kind}{kind of data: "q" = water quality, "h" = hydraulic data, "r" =

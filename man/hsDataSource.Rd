@@ -4,8 +4,14 @@
 \alias{hsDataSource}
 \title{Get Metadata About Data Sources}
 \usage{
-hsDataSource(qua.level = NULL, moniPoint = NULL, parName, kind = "q",
-  owner = "KWB", dbg = FALSE)
+hsDataSource(
+  qua.level = NULL,
+  moniPoint = NULL,
+  parName,
+  kind = "q",
+  owner = "KWB",
+  dbg = FALSE
+)
 }
 \arguments{
 \item{qua.level}{data quality level ("r" = raw, "v" = validated, "c" =

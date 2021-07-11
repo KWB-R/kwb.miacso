@@ -4,8 +4,13 @@
 \alias{hsPars}
 \title{Names of available parameters}
 \usage{
-hsPars(kind = NULL, moniPoint = NULL, qua.level = "c",
-  owner = "KWB", dbg = TRUE)
+hsPars(
+  kind = NULL,
+  moniPoint = NULL,
+  qua.level = "c",
+  owner = "KWB",
+  dbg = TRUE
+)
 }
 \arguments{
 \item{kind}{kind of data: "q" = water quality, "h" = hydraulic data, "r" =

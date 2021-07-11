@@ -4,8 +4,7 @@
 \alias{hsGetFpAndValRaw}
 \title{Read Values and Fingerprints from Database}
 \usage{
-hsGetFpAndValRaw(moniPoint, parNames, year, firstDate, lastDate,
-  home = FALSE)
+hsGetFpAndValRaw(moniPoint, parNames, year, firstDate, lastDate, home = FALSE)
 }
 \arguments{
 \item{moniPoint}{name of monitoring point}

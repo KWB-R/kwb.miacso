@@ -4,8 +4,15 @@
 \alias{hsMiaCsoDataAvailability}
 \title{Provide Information on Data Availabilities}
 \usage{
-hsMiaCsoDataAvailability(level, moniPoint, parName, dateFirst = NULL,
-  dateLast = NULL, tstep = NULL, dbg = FALSE)
+hsMiaCsoDataAvailability(
+  level,
+  moniPoint,
+  parName,
+  dateFirst = NULL,
+  dateLast = NULL,
+  tstep = NULL,
+  dbg = FALSE
+)
 }
 \arguments{
 \item{level}{one of "r" (= raw), "v" (= validated), "c" (= calibrated)}
