@@ -1,6 +1,5 @@
 # kwbMonitoringPath ------------------------------------------------------------
 kwbMonitoringPath <- function()
 {
-  #"//moby/miacso$/Daten/ACCESS/KwbMonitoring"
-  "//medusa/miacso$/Daten/ACCESS/KwbMonitoring"
+  file.path(Sys.getenv("SERVERNAME"), "miacso$/Daten/ACCESS/KwbMonitoring")
 }
